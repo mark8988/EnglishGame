@@ -35,6 +35,10 @@ const assert=require('node:assert/strict');
  await page.evaluate(()=>{buy('extra21');state.roomDisplays[state.room]=['extra21'];save();render()});assert.equal(await page.locator('.display-item').count(),1);
  await page.locator('[data-room="kitchen"]').click();assert.equal(await page.locator('.display-item').count(),0);
  await page.locator('[data-room="living"]').click();assert.equal(await page.locator('.display-item').count(),1);assert.equal(await page.locator('[data-room]').count(),11);
+ // Every room can be reached on the map; only one current location is marked.
+ for(const id of await page.evaluate(()=>ROOMS.map(r=>r[0]))){await page.locator(`[data-room="${id}"]`).click();assert.equal(await page.locator('#roomTabs [aria-current="location"]').count(),1);assert.equal(await page.locator('#roomTabs [aria-current="location"]').getAttribute('data-room'),id);assert.match(await page.locator('#floorplanLocation').innerText(),new RegExp(await page.locator('#roomTitle').innerText()));}
+ await page.reload();assert.equal(await page.locator('[aria-current="location"]').getAttribute('data-room'),'garage');
+ await page.locator('[data-room="living"]').focus();await page.keyboard.press('Enter');assert.equal(await page.locator('[aria-current="location"]').getAttribute('data-room'),'living');
  await page.evaluate(()=>{state.coins=1000;adoptPet('cheetah');adoptPet('alien');adoptPet('dragon');adoptPet('kitten')});assert.equal(await page.evaluate(()=>state.pets.length),3);
  assert.equal(await page.locator('.pet-sprite').count(),3);
  await page.evaluate(()=>{state.pets[0].food=10;buy('pet-kibble')});assert.equal(await page.evaluate(()=>state.petInventory['pet-kibble']),1);

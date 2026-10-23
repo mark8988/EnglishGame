@@ -23,7 +23,8 @@ const $=id=>document.getElementById(id);const has=id=>state.owned.includes(id)&&
 function save(){try{localStorage.setItem(KEY,JSON.stringify(state))}catch{$('story').textContent='瀏覽器無法儲存進度，請保持本頁開啟。'}}
 function render(){
  for(const [id] of ROOMS)if(!Array.isArray(state.roomDisplays[id]))state.roomDisplays[id]=[];
- $("roomTabs").innerHTML=ROOMS.map(([id,name,icon])=>`<button data-room="${id}" aria-pressed="${state.room===id}">${icon} ${name}</button>`).join('');
+ $("roomTabs").innerHTML=ROOMS.map(([id,name,icon])=>`<button class="plan-room" style="grid-area:${id}" data-room="${id}" aria-pressed="${state.room===id}" ${state.room===id?'aria-current="location"':''} aria-label="${name}${state.room===id?'，目前所在房間':'，點選前往'}"><span class="plan-icon" aria-hidden="true">${icon}</span><b>${name}</b><small>${state.room===id?'● 你在這裡':'點選前往'}</small></button>`).join('')+'<div class="plan-hall" aria-hidden="true">走　廊</div>';
+ $("floorplanLocation").textContent='📍 目前位置：'+ROOMS.find(r=>r[0]===state.room)[1];
  $("roomTitle").textContent=ROOMS.find(r=>r[0]===state.room)[1];
  $("room").dataset.space=state.room;
  $("roomMarker").textContent=ROOMS.find(r=>r[0]===state.room)[2];
