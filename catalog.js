@@ -249,7 +249,7 @@ const EXTRA_PRODUCTS = [
     "consumable": false,
     "food": 0,
     "warmth": 8,
-    "desc": "溫暖 +8，可收藏展示。"
+    "desc": "溫暖 +8，解鎖莉莉的對應穿搭造型。"
   },
   {
     "id": "extra22",
@@ -261,7 +261,7 @@ const EXTRA_PRODUCTS = [
     "consumable": false,
     "food": 0,
     "warmth": 8,
-    "desc": "溫暖 +8，可收藏展示。"
+    "desc": "溫暖 +8，解鎖莉莉的對應穿搭造型。"
   },
   {
     "id": "extra23",
@@ -273,7 +273,7 @@ const EXTRA_PRODUCTS = [
     "consumable": false,
     "food": 0,
     "warmth": 8,
-    "desc": "溫暖 +8，可收藏展示。"
+    "desc": "溫暖 +8，解鎖莉莉的對應穿搭造型。"
   },
   {
     "id": "extra24",
@@ -285,7 +285,7 @@ const EXTRA_PRODUCTS = [
     "consumable": false,
     "food": 0,
     "warmth": 8,
-    "desc": "溫暖 +8，可收藏展示。"
+    "desc": "溫暖 +8，解鎖莉莉的對應穿搭造型。"
   },
   {
     "id": "extra25",
@@ -297,7 +297,7 @@ const EXTRA_PRODUCTS = [
     "consumable": false,
     "food": 0,
     "warmth": 8,
-    "desc": "溫暖 +8，可收藏展示。"
+    "desc": "溫暖 +8，解鎖莉莉的對應穿搭造型。"
   },
   {
     "id": "extra26",
@@ -309,7 +309,7 @@ const EXTRA_PRODUCTS = [
     "consumable": false,
     "food": 0,
     "warmth": 8,
-    "desc": "溫暖 +8，可收藏展示。"
+    "desc": "溫暖 +8，解鎖莉莉的對應穿搭造型。"
   },
   {
     "id": "extra27",
@@ -321,7 +321,7 @@ const EXTRA_PRODUCTS = [
     "consumable": false,
     "food": 0,
     "warmth": 8,
-    "desc": "溫暖 +8，可收藏展示。"
+    "desc": "溫暖 +8，解鎖莉莉的對應穿搭造型。"
   },
   {
     "id": "extra28",
@@ -333,7 +333,7 @@ const EXTRA_PRODUCTS = [
     "consumable": false,
     "food": 0,
     "warmth": 8,
-    "desc": "溫暖 +8，可收藏展示。"
+    "desc": "溫暖 +8，解鎖莉莉的對應穿搭造型。"
   },
   {
     "id": "extra29",
@@ -345,7 +345,7 @@ const EXTRA_PRODUCTS = [
     "consumable": false,
     "food": 0,
     "warmth": 8,
-    "desc": "溫暖 +8，可收藏展示。"
+    "desc": "溫暖 +8，解鎖莉莉的對應穿搭造型。"
   },
   {
     "id": "extra30",
@@ -357,7 +357,7 @@ const EXTRA_PRODUCTS = [
     "consumable": false,
     "food": 0,
     "warmth": 8,
-    "desc": "溫暖 +8，可收藏展示。"
+    "desc": "溫暖 +8，解鎖莉莉的對應穿搭造型。"
   },
   {
     "id": "extra31",
@@ -369,7 +369,7 @@ const EXTRA_PRODUCTS = [
     "consumable": false,
     "food": 0,
     "warmth": 8,
-    "desc": "溫暖 +8，可收藏展示。"
+    "desc": "溫暖 +8，解鎖莉莉的對應穿搭造型。"
   },
   {
     "id": "extra32",
@@ -381,7 +381,7 @@ const EXTRA_PRODUCTS = [
     "consumable": false,
     "food": 0,
     "warmth": 8,
-    "desc": "溫暖 +8，可收藏展示。"
+    "desc": "溫暖 +8，解鎖莉莉的對應穿搭造型。"
   },
   {
     "id": "extra33",
@@ -393,7 +393,7 @@ const EXTRA_PRODUCTS = [
     "consumable": false,
     "food": 0,
     "warmth": 8,
-    "desc": "溫暖 +8，可收藏展示。"
+    "desc": "溫暖 +8，解鎖莉莉的對應穿搭造型。"
   },
   {
     "id": "extra34",
@@ -405,7 +405,7 @@ const EXTRA_PRODUCTS = [
     "consumable": false,
     "food": 0,
     "warmth": 8,
-    "desc": "溫暖 +8，可收藏展示。"
+    "desc": "溫暖 +8，解鎖莉莉的對應穿搭造型。"
   },
   {
     "id": "extra35",
@@ -417,7 +417,7 @@ const EXTRA_PRODUCTS = [
     "consumable": false,
     "food": 0,
     "warmth": 8,
-    "desc": "溫暖 +8，可收藏展示。"
+    "desc": "溫暖 +8，解鎖莉莉的對應穿搭造型。"
   },
   {
     "id": "extra36",
@@ -429,7 +429,7 @@ const EXTRA_PRODUCTS = [
     "consumable": false,
     "food": 0,
     "warmth": 8,
-    "desc": "溫暖 +8，可收藏展示。"
+    "desc": "溫暖 +8，解鎖莉莉的對應穿搭造型。"
   },
   {
     "id": "extra37",

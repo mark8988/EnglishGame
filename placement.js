@@ -1,7 +1,7 @@
 // Coordinates are percentages of the room, so layouts survive screen size changes.
 let selectedFurniture=null;
 let furnitureDrag=null;
-function placeable(p){return !!p&&!p.consumable&&!p.petSupply&&!['roof','window','floor'].includes(p.id)&&p.id!=='soup'}
+function placeable(p){return !!p&&!isWearable(p)&&!p.consumable&&!p.petSupply&&!['roof','window','floor'].includes(p.id)&&p.id!=='soup'}
 function migratePlacements(){
  if(!state.placements||typeof state.placements!=='object')state.placements={};
  if(state.placementVersion===1)return;
@@ -22,7 +22,7 @@ function renderPlacedItems(target,placements=state.placements,owned=state.owned,
 }
 function limitPosition(n){return Number.isFinite(n)?Math.max(0,Math.min(100,n)):50}
 function updatePlacement(id,x,y,el){const rect=$('room').getBoundingClientRect(),item=el.getBoundingClientRect();const mx=item.width/rect.width*50,my=item.height/rect.height*50;const p=state.placements[id];p.x=Math.max(mx,Math.min(100-mx,x));p.y=Math.max(my,Math.min(100-my,y));el.style.left=p.x+'%';el.style.top=p.y+'%';el.style.zIndex=String(10+Math.round(p.y))}
-function selectFurniture(id){selectedFurniture=id;document.querySelectorAll('#decor [data-item]').forEach(el=>el.setAttribute('aria-pressed',String(el.dataset.item===id)));const p=products.find(p=>p.id===id);$('placementStatus').textContent=p?`已選取 ${p.name} · 拖曳擺放，方向鍵微調`:'購買物品會放入目前房間，可拖曳自由布置。';$('storeFurniture').disabled=!id}
+function selectFurniture(id){selectedFurniture=id;document.querySelectorAll('#decor [data-item]').forEach(el=>el.setAttribute('aria-pressed',String(el.dataset.item===id)));const p=products.find(p=>p.id===id);$('placementStatus').textContent=p?`已選取 ${p.name} · 拖曳擺放，方向鍵微調`:'購買家具會放入目前房間，可拖曳自由布置。';$('storeFurniture').disabled=!id}
 function togglePlacement(id){const p=products.find(p=>p.id===id);if(!placeable(p)||!has(id))return;if(state.placements[id]?.room===state.room){delete state.placements[id];selectedFurniture=null}else{newPlacement(id);selectedFurniture=id}save();render()}
 function initPlacementControls(){
  $('decor').addEventListener('pointerdown',e=>{const el=e.target.closest('[data-item]');if(!el||e.button!==0||furnitureDrag)return;e.preventDefault();const id=el.dataset.item;const bounds=$('room').getBoundingClientRect();const p=state.placements[id];selectFurniture(id);el.focus({preventScroll:true});furnitureDrag={id,pointer:e.pointerId,start:{...p},dx:e.clientX-bounds.left-p.x/100*bounds.width,dy:e.clientY-bounds.top-p.y/100*bounds.height};el.setPointerCapture(e.pointerId);el.classList.add('dragging')});
