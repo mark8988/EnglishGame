@@ -1,5 +1,6 @@
 // Original local illustrations; no remote image service is needed at runtime.
 function artIcon(symbol,id,kind='item'){
+ if(kind==='item'&&typeof refinedArt==='function'){const art=refinedArt(symbol,id);if(art)return art}
  const src=id?`assets/art/${kind}-${id}.svg`:'assets/art/badge.svg';
  return `<img class="cute-icon" src="${src}" alt="${symbol}" draggable="false">`;
 }
