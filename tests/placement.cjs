@@ -1,0 +1,23 @@
+const {chromium}=require('playwright');const assert=require('node:assert/strict');
+(async()=>{const browser=await chromium.launch({headless:true,...(process.env.CHROMIUM_PATH?{executablePath:process.env.CHROMIUM_PATH,args:['--no-sandbox']}:{})});try{
+ const page=await browser.newPage({viewport:{width:1440,height:1000}});const errors=[];page.on('pageerror',e=>errors.push(e.message));await page.goto('http://127.0.0.1:8000');
+ await page.evaluate(()=>{state=fresh();state.coins=1000;render()});assert.equal(await page.locator('#decor [data-item]').count(),0);
+ await page.locator('#roomSelect').selectOption('kitchen');await page.locator('[data-tab="shop"]').click();await page.locator('[data-buy="bed"]').click();
+ assert.equal(await page.evaluate(()=>state.placements.bed.room),'kitchen');const bed=page.locator('#decor [data-item="bed"]');assert.equal(await bed.count(),1);
+ const before=await page.evaluate(()=>({...state.placements.bed}));const box=await bed.boundingBox();await page.mouse.move(box.x+box.width/2,box.y+box.height/2);await page.mouse.down();await page.mouse.move(box.x+box.width/2+170,box.y+box.height/2+75,{steps:12});await page.mouse.up();
+ const moved=await page.evaluate(()=>({...state.placements.bed}));assert(moved.x>before.x+5);assert(moved.y>before.y+5);await page.reload();assert.deepEqual(await page.evaluate(()=>state.placements.bed),moved);
+ await bed.focus();await page.keyboard.press('ArrowRight');assert((await page.evaluate(()=>state.placements.bed.x))>moved.x);
+ const again=await bed.boundingBox();await page.mouse.move(again.x+again.width/2,again.y+again.height/2);await page.mouse.down();await page.mouse.move(1,1,{steps:10});await page.mouse.up();let rb=await page.locator('#room').boundingBox(),ib=await bed.boundingBox();assert(ib.x>=rb.x-1&&ib.y>=rb.y-1,'Cannot drag outside room');
+ await page.locator('#roomSelect').selectOption('study');assert.equal(await bed.count(),0);await page.locator('[data-tab="shop"]').click();await page.locator('[data-display="bed"]').click();assert.equal(await page.evaluate(()=>state.placements.bed.room),'study');assert.equal(await bed.count(),1);
+ await page.locator('#storeFurniture').click();assert.equal(await bed.count(),0);assert.equal(await page.evaluate(()=>has('bed')),true);await page.locator('[data-display="bed"]').click();assert.equal(await bed.count(),1);
+ await page.evaluate(()=>{buy('soup');buy('pet-kibble')});assert.equal(await page.locator('#decor [data-item]').count(),1);
+ await page.evaluate(()=>{state.durability.bed=0;render()});assert.equal(await bed.count(),0);await page.evaluate(()=>buy('bed'));assert.equal(await bed.count(),1);
+ // All owned furnishings are retained: no four-item eviction.
+ await page.evaluate(()=>{state.coins=10000;['extra37','extra38','extra39','extra40','extra41','extra42'].forEach(buy)});assert.equal(await page.locator('#decor [data-item]').count(),7);
+ await page.setViewportSize({width:390,height:844});assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
+ // Real touch events through Chromium, using pointer capture while dragging.
+ const context=await browser.newContext({viewport:{width:390,height:844},hasTouch:true,isMobile:true});const touch=await context.newPage();await touch.goto('http://127.0.0.1:8000');await touch.evaluate(()=>{state=fresh();state.coins=1000;buy('bed')});const tb=await touch.locator('[data-item="bed"]').boundingBox();const cdp=await context.newCDPSession(touch);const tx=tb.x+tb.width/2,ty=tb.y+tb.height/2;await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:tx,y:ty}]});await cdp.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:tx+65,y:ty+25}]});await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});assert((await touch.evaluate(()=>state.placements.bed.x))>30);await context.close();
+ // Migrate a pre-placement saved game without losing coins or owned furniture.
+ await page.evaluate(()=>localStorage.setItem(KEY,JSON.stringify({coins:321,warmth:50,food:60,solved:7,owned:['bed','extra37'],seen:[],display:['extra37'],room:'living',roomDisplays:{living:['extra37']}})));await page.reload();assert.equal(await page.evaluate(()=>state.coins),321);assert.equal(await page.evaluate(()=>state.placements.extra37.room),'living');assert.equal(await page.evaluate(()=>state.placements.bed.room),'bedroom');assert.deepEqual(errors,[]);
+ console.log('PASS: empty initial room, automatic placement, mouse drag, keyboard, boundary, save/reload, move room, backpack, consumables excluded, worn furniture/rebuy, >4 items, mobile touch drag, old save migration');
+}finally{await browser.close()}})().catch(e=>{console.error(e);process.exit(1)});
