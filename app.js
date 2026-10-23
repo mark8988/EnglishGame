@@ -47,7 +47,7 @@ function render(){
 function buy(id){const p=products.find(p=>p.id===id);if(!p||state.coins<p.cost||has(id))return;state.coins-=p.cost;if(p.petSupply&&p.consumable){state.petInventory[id]=(state.petInventory[id]||0)+1}else if(p.consumable){state.food=clamp(state.food+p.food)}else if(id==='soup'){state.food=clamp(state.food+40);state.warmth=clamp(state.warmth+10)}else{if(!state.owned.includes(id))state.owned.push(id);state.durability[id]=100;state.warmth=clamp(state.warmth+(p.petSupply?0:p.warmth??({coat:20,blanket:20,fire:35,floor:10,bed:15}[id]||5)))}save();render()}
 let current,locked=false,reverse=false,mode=0;
 const rewards=[2,5,8,12,15];
-const modeNames=['入門・英翻中','普通・中翻英','進階・聽音選中文','挑戰・聽音辨英文','大師・聽音拼字'];
+const modeNames=['入門・英翻中','普通・看中文寫英文','進階・聽音選中文','挑戰・聽音辨英文','大師・聽音拼字'];
 const audioSupported=()=> 'speechSynthesis' in window && 'SpeechSynthesisUtterance' in window;
 function shuffle(a){return [...a].sort(()=>Math.random()-.5)}
 function next(){
@@ -59,14 +59,17 @@ function next(){
  $('qtype').textContent=modeNames[mode];$('question').textContent=mode>=2?'🎧 聽一聽，再作答':reverse?current.zh:current.en;
  $('speak').textContent=mode>=2?'▶ 播放 / 重聽題目':'🔊 聽英文發音';
  $('taskTitle').textContent=mode>=2?'聽力委託：聽見冬日的聲音':'小鎮的單字委託';
- $('spelling').hidden=mode!==4;$('spellInput').value='';$('spellInput').disabled=false;$('spelling').querySelector('button').disabled=false;
- $('answers').hidden=mode===4;
+ $('spelling').hidden=mode!==1&&mode!==4;
+ $('spellInput').placeholder=mode===1?'請輸入中文意思對應的英文':'請輸入聽到的英文';
+ $('spellInput').setAttribute('aria-label',mode===1?'看中文輸入英文':'輸入聽到的英文');
+ $('speak').hidden=mode===1;$('spellInput').value='';$('spellInput').disabled=false;$('spelling').querySelector('button').disabled=false;
+ $('answers').hidden=mode===1||mode===4;
  const choices=shuffle([current,...shuffle(WORDS.filter(w=>w.id!==current.id)).slice(0,mode===0?2:mode===3?5:3)]);
- $('answers').innerHTML=choices.map(w=>`<button data-answer="${w.id}">${reverse?w.en:w.zh}</button>`).join('');
+ $('answers').innerHTML=(mode===1||mode===4?[]:choices).map(w=>`<button data-answer="${w.id}">${reverse?w.en:w.zh}</button>`).join('');
 }
 function normalize(s){return s.toLowerCase().trim().replace(/\s+/g,' ')}
 function spellingCorrect(value){let variants=current.en.split(' / ');if(current.en==='blond(e)')variants=['blond','blonde'];if(current.en==='have (got) to')variants=['have to','have got to'];return variants.some(v=>normalize(v)===normalize(value))}
-function answer(id){if(locked)return;locked=true;const ok=mode===4?spellingCorrect(id):id===current.id;$('spellInput').disabled=true;$('spelling').querySelector('button').disabled=true;state.turn++;depreciate();tickPets();document.querySelectorAll('[data-answer]').forEach(b=>{b.disabled=true;if(+b.dataset.answer===current.id)b.classList.add('correct');else if(+b.dataset.answer===id)b.classList.add('wrong')});if(ok){state.coins+=rewards[mode];state.solved++;state.seen.push(current.id)}state.food=clamp(state.food-1);state.warmth=clamp(state.warmth-(has('roof')?0:2)-(has('window')?0:2)+(has('fire')?3:0));if(state.food===0||state.warmth===0){state.food=Math.max(20,state.food);state.warmth=Math.max(15,state.warmth);$('feedback').textContent='鄰居送來緊急物資，莉莉暫時安全了。先買熱湯、修好房子吧！ '}
+function answer(id){if(locked)return;if((mode===1||mode===4)&&!String(id).trim()){$('feedback').textContent='先試著輸入英文，再送出答案喔。';$('spellInput').focus();return}locked=true;const ok=(mode===1||mode===4)?spellingCorrect(id):id===current.id;$('spellInput').disabled=true;$('spelling').querySelector('button').disabled=true;state.turn++;depreciate();tickPets();document.querySelectorAll('[data-answer]').forEach(b=>{b.disabled=true;if(+b.dataset.answer===current.id)b.classList.add('correct');else if(+b.dataset.answer===id)b.classList.add('wrong')});if(ok){state.coins+=rewards[mode];state.solved++;state.seen.push(current.id)}state.food=clamp(state.food-1);state.warmth=clamp(state.warmth-(has('roof')?0:2)-(has('window')?0:2)+(has('fire')?3:0));if(state.food===0||state.warmth===0){state.food=Math.max(20,state.food);state.warmth=Math.max(15,state.warmth);$('feedback').textContent='鄰居送來緊急物資，莉莉暫時安全了。先買熱湯、修好房子吧！ '}
  $('feedback').textContent+=(ok?`✓ 答對了！獲得 ${rewards[mode]} 金幣。`:'再記一次，下次一定會！')+` ${current.en} → ${current.zh}`;$('next').hidden=false;save();render()}
 function speak(text){if('speechSynthesis'in window){speechSynthesis.cancel();let u=new SpeechSynthesisUtterance(text.split(' / ')[0]);u.lang='en-US';u.rate=.8;u.onerror=()=>{$('feedback').textContent='語音播放失敗，請確認裝置有英文語音並重試播放；也可按下一個任務。';$('next').hidden=false};speechSynthesis.speak(u)}else{$('feedback').textContent='此瀏覽器不支援語音朗讀。'}}
 function words(){let q=$('search').value.toLowerCase();$('wordList').replaceChildren();WORDS.filter(w=>(w.en+w.zh).toLowerCase().includes(q)).forEach(w=>{let d=document.createElement('div');d.className='word';let a=document.createElement('div');a.textContent=`${w.id}. ${w.en}`;let b=document.createElement('span');b.textContent=w.zh;let btn=document.createElement('button');btn.textContent='🔊';btn.setAttribute('aria-label',`朗讀 ${w.en}`);btn.onclick=()=>speak(w.en);d.append(a,b,btn);$('wordList').append(d)})}

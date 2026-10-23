@@ -13,12 +13,20 @@ const assert=require('node:assert/strict');
   assert.equal(await page.evaluate(()=>mode),i);
   const before=await page.evaluate(()=>state.coins);
   if(i>=2){assert.equal(await page.locator('#question').innerText(),'🎧 聽一聽，再作答');await page.locator('#speak').click();assert.equal(await page.evaluate(()=>spoken.at(-1)),await page.evaluate(()=>current.en.split(' / ')[0]));}
-  if(i===4){await page.locator('#spellInput').fill(await page.evaluate(()=>current.en==='blond(e)'?'blond':current.en==='have (got) to'?'have to':current.en.split(' / ')[0]));await page.locator('#spelling button').click()}
+  if(i===1||i===4){await page.locator('#spellInput').fill(await page.evaluate(()=>current.en==='blond(e)'?'blond':current.en==='have (got) to'?'have to':current.en.split(' / ')[0]));await page.locator('#spelling button').click()}
   else{const id=await page.evaluate(()=>current.id);await page.locator(`[data-answer="${id}"]`).click()}
   assert.equal(await page.evaluate(()=>state.coins),before+[2,5,8,12,15][i]);
   await page.evaluate(()=>answer(current.id));assert.equal(await page.evaluate(()=>state.coins),before+[2,5,8,12,15][i]);
   await page.locator('#next').click();
  }
+ // Typing tasks reject empty and incorrect input, accept spelling variants, and hide choices.
+ await page.evaluate(()=>{state.turn=1;next();current=WORDS.find(w=>w.en==='blanket');$('question').textContent=current.zh});
+ assert.equal(await page.locator('#answers button').count(),0);assert(await page.locator('#speak').isHidden());
+ const typingCoins=await page.evaluate(()=>state.coins);const turnBefore=await page.evaluate(()=>state.turn);
+ await page.locator('#spelling button').click();assert.equal(await page.evaluate(()=>state.turn),turnBefore);
+ await page.locator('#spellInput').fill('blankit');await page.locator('#spelling button').click();assert.equal(await page.evaluate(()=>state.coins),typingCoins);assert.match(await page.locator('#feedback').innerText(),/blanket/);
+ await page.evaluate(()=>{state.turn=1;next();current=WORDS.find(w=>w.en==='blanket')});await page.locator('#spellInput').fill('  BLANKET  ');await page.locator('#spelling button').click();assert.equal(await page.evaluate(()=>state.coins),typingCoins+5);
+ await page.evaluate(()=>{current=WORDS.find(w=>w.en==='have (got) to')});assert(await page.evaluate(()=>spellingCorrect('have to')&&spellingCorrect('have got to')));
  await page.evaluate(()=>{state.coins=1000;buy('roof');state.durability.roof=1;depreciate();render()});assert.equal(await page.evaluate(()=>has('roof')),false);
  await page.locator('[data-tab="shop"]').click();await page.locator('[data-buy="roof"]').click();assert.equal(await page.evaluate(()=>state.durability.roof),100);assert.equal(await page.evaluate(()=>state.owned.filter(x=>x==='roof').length),1);
  await page.locator('#category').selectOption('食');assert.equal(await page.locator('.product').count(),20);
