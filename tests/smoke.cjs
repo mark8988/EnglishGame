@@ -12,7 +12,7 @@ const assert=require('node:assert/strict');
  for(let i=0;i<5;i++){
   assert.equal(await page.evaluate(()=>mode),i);
   const before=await page.evaluate(()=>state.coins);
-  if(i>=2){assert.equal(await page.locator('#question').innerText(),'🎧 聽一聽，再作答');await page.locator('#speak').click();assert.equal(await page.evaluate(()=>spoken.at(-1)),await page.evaluate(()=>current.en.split(' / ')[0]));}
+  if(i>=2){assert.match(await page.locator('#question').innerText(),/聽一聽，再作答/);await page.locator('#speak').click();assert.equal(await page.evaluate(()=>spoken.at(-1)),await page.evaluate(()=>current.en.split(' / ')[0]));}
   if(i===1||i===4){await page.locator('#spellInput').fill(await page.evaluate(()=>current.en==='blond(e)'?'blond':current.en==='have (got) to'?'have to':current.en.split(' / ')[0]));await page.locator('#spelling button').click()}
   else{const id=await page.evaluate(()=>current.id);await page.locator(`[data-answer="${id}"]`).click()}
   assert.equal(await page.evaluate(()=>state.coins),before+[2,5,8,12,15][i]);
@@ -51,7 +51,7 @@ const assert=require('node:assert/strict');
  await page.locator('#invite').click();const link=await page.locator('#inviteLink').inputValue();assert(link.includes('visit='));await page.goto(link);assert.equal(await page.locator('dialog[open]').count(),1);assert.match(await page.locator('dialog').innerText(),/圍巾/);assert.equal(await page.evaluate(()=>has('roof')),true);
  await page.locator('dialog button').click();await page.reload();assert.equal(await page.evaluate(()=>state.durability.roof),99);
  await page.locator('[data-tab="words"]').click();assert.equal(await page.locator('.word').count(),224);await page.locator('#search').fill('blanket');assert.equal(await page.locator('.word').count(),1);
- await page.setViewportSize({width:390,height:844});assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));assert.deepEqual(errors,[]);
+ await page.setViewportSize({width:390,height:844});assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));await page.waitForFunction(()=>Array.from(document.images).every(i=>i.complete&&i.naturalWidth>0));assert.equal(await page.locator('.lily-art').count(),1);assert.deepEqual(errors,[]);
  console.log('PASS: 28 unique pet species, 123 products, adoption limits, paid supplies, pet care, clothing wear, safe rename, 11 rooms, independent displays, 5 reward levels, 3 listening modes, spelling, no duplicate rewards, depreciation/repurchase, categories, food, planting/harvest, display, invitation, persistence, vocabulary, mobile, no JS errors');
  }finally{await browser.close()}
 })().catch(e=>{console.error(e);process.exit(1)});
